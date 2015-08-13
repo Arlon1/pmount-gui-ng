@@ -7,7 +7,7 @@ on the selected device and you don't need to specify the "mode" (mount
 or unmount upfront) this means you only need one desktop icon not two
 (one for mounting one for unmounting)
 
-The list of removable USB devices is displayed each with a checkbox, mounted
+A list of removable USB devices is displayed each with a checkbox, mounted
 devices are checked, changing the checkmark will mount or unmount as
 apropriate.
 
@@ -41,7 +41,7 @@ are simply slightly different, with a slightly nuanced intention...
 
 
 example Desktop file
-
+```
 [Desktop Entry]
 Name=pmount-gui-ng
 Comment=mounts or unmounts a removable device
@@ -52,4 +52,4 @@ Type=Application
 Categories=System;Disk
 StartupNotify=false
 Path=
-
+```
