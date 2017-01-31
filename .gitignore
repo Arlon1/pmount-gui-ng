@@ -1,0 +1,5 @@
+# compiled objects
+*.o
+
+# the binary
+pmount-gui-ng

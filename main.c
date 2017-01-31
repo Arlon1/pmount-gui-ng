@@ -10,6 +10,7 @@
 #include <sys/select.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
+#include <ctype.h>
 
 typedef struct sProperty
 {
@@ -25,7 +26,7 @@ typedef struct sDevice
     int mounted;
     time_t time;
     GtkWidget* toggle;
-    char *shortdev;
+    char *shortdev; // e.g. sda1 for device /dev/sda1
 } Device;
 
 int verbosity = 0;
@@ -523,6 +524,7 @@ Device *get_devices(void)
                 printf("  %s = %s\n", props[j].name, props[j].value);
         }
 
+
         if(can_mount(props, fstab))
         {
             char *devname;
@@ -632,7 +634,13 @@ void toggled(GtkToggleButton *button, gpointer user_data) {
 
     //printf("node=%s\n",dev->node);
 
+    /* creates a pipe
+     * pipe_fd[0] for reading
+     * pipe_fd[1] for writing */
     pipe(pipe_fd);
+    /* create a new process
+     * pid is set to 0 in the child process
+     * and to the child pid in the parent process */
     pid = fork();
     // 0 is "forker"
 
@@ -642,22 +650,24 @@ void toggled(GtkToggleButton *button, gpointer user_data) {
         hasMounted=FALSE;
     } // must set flag before fork changes execution path...
 
+    // only executed in child process
     if(pid==0)
     {
         close(pipe_fd[0]);
-        dup2(pipe_fd[1], 1);
-        dup2(pipe_fd[1], 2);
 
-
+        char mountingpoint[1024];
+        snprintf(mountingpoint,1024,"%s-%s",dev->shortdev,dev->label);
 
         if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dev->toggle))) {
-            char mp[1024];
-            snprintf(mp,1024,"%s-%s",dev->label,dev->shortdev);
-            execl("/usr/bin/pmount", "pmount", dev->node, mp, NULL);
+            //printf("mounting device /dev/%s on /media/%s\n", dev->shortdev,mountingpoint);
+            execl("/usr/bin/pmount", "pmount", dev->node, mountingpoint, NULL);
 
         } else {
-            //printf("unmounting device %s\n",dev->node);
+            //printf("unmounting device /dev/%s from /media/%s\n",dev->shortdev,mountingpoint);
             execl("/usr/bin/pumount", "pumount", dev->node, NULL);
+
+            //printf("deleting folder /media/%s",mountingpoint);
+            rmdir( strcat( "/media/", mountingpoint ) );
         }
         _exit(1);
     } // if we were forked then pickup all the colsole output
@@ -760,7 +770,7 @@ void toggled(GtkToggleButton *button, gpointer user_data) {
 // adds a check button to the list for a device
 void addDevice(Device* dev) {
     char mp[1024];
-    snprintf(mp,1024,"%s-%s",dev->label,dev->shortdev);
+    snprintf(mp,1024,"%s | %s",dev->label,dev->shortdev);
     dev->toggle=gtk_check_button_new_with_label ((gchar*)strdup(mp)); // TODO potential leak??  (cleaned by app exit anyhow)
     // TODO tool tip with description of device???
     g_signal_connect (dev->toggle, "toggled", G_CALLBACK (toggled), dev);
