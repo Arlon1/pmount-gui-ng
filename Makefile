@@ -1,15 +1,25 @@
+PREFIX = /usr/local
+BINPREFIX = "$(PREFIX)/bin"
+
+# a c compiler
+CC = gcc
 FLAGS=`pkg-config gtk+-3.0 --cflags`
 LIBS=`pkg-config gtk+-3.0 --libs`
 
-all: main
+pmount-gui-ng: main.o
+	$(CC) main.o -o pmount-gui-ng $(LIBS)
 
+%.o: %.c
+	$(CC) -c main.c -o main.o $(FLAGS)
 
-main.o: main.c
-	gcc -g -c main.c -o main.o $(FLAGS)
-	
-main: main.o
-	gcc main.o -o pmount-gui-ng $(LIBS)
-	
+PHONY +: clean
 clean:
 	rm -f main.o
 	rm -f pmount-gui-ng
+
+install:
+	mkdir -p $(BINPREFIX)
+	install -m 0755 $(LIB) $(BINPREFIX)
+
+
+.PHONY: $(PHONY)
