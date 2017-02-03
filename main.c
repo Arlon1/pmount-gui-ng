@@ -20,8 +20,8 @@ typedef struct sProperty
 
 typedef struct sDevice
 {
-    char *node;
-    char *label;
+    char *node; // "/dev/disk/by-id/<a_symlink>"
+    char *label; // label of the filesystem
     char *description;
     int mounted;
     time_t time;
