@@ -22,7 +22,7 @@ clean:
 
 install:
 	mkdir -p $(BINPREFIX)
-	install -m 0755 $(LIB) $(BINPREFIX)
+	install -m 0755 pmount-gui-ng $(BINPREFIX)
 
 
 .PHONY: $(PHONY)
