@@ -771,8 +771,11 @@ void toggled(GtkToggleButton *button, gpointer user_data) {
 void addDevice(Device* dev) {
     char mp[1024];
     snprintf(mp,1024,"%s | %s",dev->label,dev->shortdev);
+    // create a check button for the device
     dev->toggle=gtk_check_button_new_with_label ((gchar*)strdup(mp)); // TODO potential leak??  (cleaned by app exit anyhow)
-    // TODO tool tip with description of device???
+    // set tooltip for check button
+    gtk_widget_set_tooltip_text(dev->toggle, dev->description);
+
     g_signal_connect (dev->toggle, "toggled", G_CALLBACK (toggled), dev);
     gtk_widget_show(dev->toggle);
     gtk_container_add(GTK_CONTAINER(list), dev->toggle);
