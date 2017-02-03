@@ -20,8 +20,8 @@ typedef struct sProperty
 
 typedef struct sDevice
 {
-    char *node;
-    char *label;
+    char *node; // "/dev/disk/by-id/<a_symlink>"
+    char *label; // label of the filesystem
     char *description;
     int mounted;
     time_t time;
@@ -34,6 +34,7 @@ int okfeedback = FALSE;
 int hasMounted = FALSE;
 Device *devices;
 GtkWidget* window;
+
 char filemanager[1024];
 
 /**
@@ -619,12 +620,6 @@ void free_devices(Device *devices)
 GtkWidget* list; // listbox holding the check buttons
 int enable_callbacks=FALSE; // disable the tick callback
 
-// currently not used
-void button_clicked(GtkButton *button, gpointer user_data) {
-    int* my_data = (int*)user_data;
-    printf("do a refresh of devices here\n");
-}
-
 // callback called when a check button is altered
 void toggled(GtkToggleButton *button, gpointer user_data) {
     if (!enable_callbacks) return;
@@ -781,6 +776,34 @@ void addDevice(Device* dev) {
     gtk_container_add(GTK_CONTAINER(list), dev->toggle);
 }
 
+// updates the list of devices
+void update_device_list() {
+    int i;
+
+    // delete widgets
+    if(devices){
+        for(i=0; devices[i].node; ++i) {
+            printf("hiding %s\n",devices[i].shortdev);
+            gtk_widget_destroy(devices[i].toggle);
+            //gtk_container_remove(GTK_LIST(list),devices[i].toggle);
+        }
+    }
+
+    devices = get_devices();
+
+    // show devices
+    if (devices) {
+        for(i=0; devices[i].node; ++i) {
+            printf("adding %s\n",devices[i].shortdev);
+            addDevice(&devices[i]);
+            if(devices[i].mounted) {
+                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(devices[i].toggle),TRUE);
+            }
+
+        }
+    }
+}
+
 gboolean checkDevices(gpointer user_data) {
     if (!devices) {
         GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
@@ -838,25 +861,13 @@ int main(int argc, char** argv)
 
     gtk_container_add(GTK_CONTAINER(window), vbox);
     // do i need the button ??? cancel ???
-    //gtk_container_add(GTK_CONTAINER(vbox), button);
+    gtk_container_add(GTK_CONTAINER(vbox), button);
     gtk_container_add(GTK_CONTAINER(vbox), list);
 
-    static int some_data = 0xdeadbeef;
     g_signal_connect(G_OBJECT(button), "clicked",
-                     G_CALLBACK(button_clicked), &some_data);
+                     G_CALLBACK(update_device_list), NULL);
 
-    devices = get_devices();
-
-    int i;
-    if (devices) {
-        for(i=0; devices[i].node; ++i) {
-            addDevice(&devices[i]);
-            if(devices[i].mounted) {
-                gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(devices[i].toggle),TRUE);
-            }
-
-        }
-    }
+    update_device_list();
 
     enable_callbacks=TRUE;  // just so they don't fire when setting up active states
 
