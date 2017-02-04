@@ -41,8 +41,8 @@ are simply slightly different, with a slightly nuanced intention...
 
 
 example Desktop file
-```
-[Desktop Entry]
+
+```[Desktop Entry]
 Name=pmount-gui-ng
 Comment=mounts or unmounts a removable device
 Exec=/usr/bin/pmount-gui-ng -f /usr/bin/pcmanfm
@@ -51,5 +51,4 @@ Terminal=false
 Type=Application
 Categories=System;Disk
 StartupNotify=false
-Path=
-```
+Path=```
