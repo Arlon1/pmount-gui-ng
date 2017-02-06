@@ -45,19 +45,5 @@ more slanted to use via a desktop shortcut icon - they both share large
 chunks of code and I don't think either is better than the other, they
 are simply slightly different, with a slightly nuanced intention...
 
-
-example Desktop file
-
-
-```
-[Desktop Entry]
-Name=pmount-gui-ng
-Comment=mounts or unmounts a removable device
-Exec=/usr/bin/pmount-gui-ng -f /usr/bin/pcmanfm
-Icon=/usr/share/icons/Adwaita/48x48/devices/media-removable.png
-Terminal=false
-Type=Application
-Categories=System;Disk
-StartupNotify=false
-Path=
-```
+You can install using the Makefile which will also include a .desktop file which
+should allow you to run the application from your chosen X front end.
