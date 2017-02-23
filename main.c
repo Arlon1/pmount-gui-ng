@@ -832,7 +832,9 @@ gboolean update_device_list() {
         }
     }
     else{
-        // TODO error handling
+        // error handling
+        printf( KRED "[ERROR]" KNRM " An error occurred. Quiting.\n");
+        gtk_main_quit();
     }
 
     // for this function to be executed multiple times
