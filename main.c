@@ -791,6 +791,9 @@ void addDevice(Device* dev) {
 
 // updates the list of devices
 gboolean update_device_list() {
+    /* TODO save the position of the marked list entry
+     * and restore at the end of update_device_list */
+
     int i;
 
     // delete widgets
@@ -832,9 +835,8 @@ gboolean update_device_list() {
         // TODO error handling
     }
 
-    /* for this function to be executed only once
-     * see g_idle_add() */
-    return FALSE;
+    // for this function to be executed multiple times
+    return TRUE;
 }
 
 int main(int argc, char** argv)
@@ -880,31 +882,27 @@ int main(int argc, char** argv)
             "/usr/share/icons/Adwaita/48x48/devices/media-removable.png",
             NULL);
 
-    GtkWidget* button = gtk_button_new_with_label((gchar*)"Refresh");
-
     list = gtk_list_box_new ();
     GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 
     gtk_container_add(GTK_CONTAINER(window), vbox);
     // do i need the button ??? cancel ???
-    gtk_container_add(GTK_CONTAINER(vbox), button);
     gtk_container_add(GTK_CONTAINER(vbox), list);
-
-    g_signal_connect(G_OBJECT(button), "clicked",
-                     G_CALLBACK(update_device_list), NULL);
 
     enable_callbacks=TRUE;  // just so they don't fire when setting up active states
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
-    gtk_widget_show(button);
+    // fill the device list once
+    update_device_list();
+
     gtk_widget_show(list);
     gtk_widget_show(vbox);
     gtk_widget_show(window);
 
-    // update device list after gtk has realised the window
-    // TODO exectue update_device_list() every ~0.5-1s
-    g_idle_add (update_device_list,NULL);
+    /* exectue update_device_list() every 500ms
+     * after gtk has realised the window */
+    g_timeout_add(500,update_device_list,NULL);
 
     gtk_main();
 
