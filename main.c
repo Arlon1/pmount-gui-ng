@@ -798,7 +798,9 @@ void update_device_list() {
     // show devices
     if (devices) {
         for(i=0; devices[i].node; ++i) {
-            printf("adding %s\n",devices[i].shortdev);
+            if(verbosity >= 2){
+                printf("adding %s\n",devices[i].shortdev);
+            }
             addDevice(&devices[i]);
             if(devices[i].mounted) {
                 gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(devices[i].toggle),TRUE);
