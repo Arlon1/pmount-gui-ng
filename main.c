@@ -784,8 +784,12 @@ void update_device_list() {
     if(devices){
         for(i=0; devices[i].node; ++i) {
             printf("hiding %s\n",devices[i].shortdev);
-            gtk_widget_destroy(devices[i].toggle);
-            //gtk_container_remove(GTK_LIST(list),devices[i].toggle);
+            GList *children, *iter;
+
+            children = gtk_container_get_children(GTK_CONTAINER(list));
+            for(iter = children; iter != NULL; iter = g_list_next(iter))
+            gtk_widget_destroy(GTK_WIDGET(iter->data));
+            g_list_free(children);
         }
     }
 
