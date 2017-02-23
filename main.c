@@ -786,7 +786,7 @@ void addDevice(Device* dev) {
 
     g_signal_connect (dev->toggle, "toggled", G_CALLBACK (toggled), dev);
     gtk_widget_show(dev->toggle);
-    gtk_container_add(GTK_CONTAINER(list), dev->toggle);
+    gtk_list_box_prepend(GTK_LIST_BOX(list), dev->toggle);
 }
 
 // updates the list of devices
@@ -794,6 +794,8 @@ gboolean update_device_list() {
     /* TODO save the position of the marked list entry
      * and restore at the end of update_device_list */
 
+    GtkListBoxRow *selected_row = NULL;
+    selected_row = gtk_list_box_get_selected_row ( GTK_LIST_BOX(list) );
     int i;
 
     // delete widgets
@@ -835,6 +837,10 @@ gboolean update_device_list() {
         // error handling
         printf( KRED "[ERROR]" KNRM " An error occurred. Quiting.\n");
         gtk_main_quit();
+    }
+
+    if( selected_row ){
+        gtk_list_box_select_row (GTK_LIST_BOX(list), selected_row);
     }
 
     // for this function to be executed multiple times
@@ -885,6 +891,9 @@ int main(int argc, char** argv)
             NULL);
 
     list = gtk_list_box_new ();
+    // one or no entry can be selected
+    gtk_list_box_set_selection_mode(GTK_LIST_BOX(list), GTK_SELECTION_SINGLE);
+
     GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 
     gtk_container_add(GTK_CONTAINER(window), vbox);
