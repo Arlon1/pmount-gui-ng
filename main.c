@@ -12,6 +12,19 @@
 #include <gdk/gdkkeysyms.h>
 #include <ctype.h>
 
+/* define some macros for colored terminal output
+ * snippet:
+ * printf (KRED "[ERROR]" KRN "error message");
+ */
+#define KNRM  "\x1B[0m" // normal
+#define KRED  "\x1B[31m" // red
+#define KGRN  "\x1B[32m" // green
+#define KYEL  "\x1B[33m" // yellow
+#define KBLU  "\x1B[34m" // blue
+#define KMAG  "\x1B[35m" // magenta
+#define KCYN  "\x1B[36m" // cyan
+#define KWHT  "\x1B[37m" // white
+
 typedef struct sProperty
 {
     char *name;
@@ -777,7 +790,7 @@ void addDevice(Device* dev) {
 }
 
 // updates the list of devices
-void update_device_list() {
+gboolean update_device_list() {
     int i;
 
     // delete widgets
@@ -808,19 +821,19 @@ void update_device_list() {
 
         }
     }
-}
-
-gboolean checkDevices(gpointer user_data) {
-    if (!devices) {
-        GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
-                            "Sorry couldn't find any appropriate devices");
-        g_signal_connect(dialog, "response", &gtk_main_quit, NULL);
-        gtk_widget_show_all(dialog);
-
+    else if (!devices){
+        if( verbosity >= 1){
+            printf(KRED "[ERROR]" KNRM " Sorry couldn't find any appropriate devices.\n");
+        }
     }
+    else{
+        // TODO error handling
+    }
+
+    /* for this function to be executed only once
+     * see g_idle_add() */
     return FALSE;
 }
-
 
 int main(int argc, char** argv)
 {
@@ -873,8 +886,6 @@ int main(int argc, char** argv)
     g_signal_connect(G_OBJECT(button), "clicked",
                      G_CALLBACK(update_device_list), NULL);
 
-    update_device_list();
-
     enable_callbacks=TRUE;  // just so they don't fire when setting up active states
 
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
@@ -884,8 +895,9 @@ int main(int argc, char** argv)
     gtk_widget_show(vbox);
     gtk_widget_show(window);
 
-    // check devices after gtk has realised the window
-    g_idle_add (checkDevices,NULL);
+    // update device list after gtk has realised the window
+    // TODO exectue update_device_list() every ~0.5-1s
+    g_idle_add (update_device_list,NULL);
 
     gtk_main();
 
