@@ -873,6 +873,11 @@ int main(int argc, char** argv)
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
+    // program icon
+    gtk_window_set_icon_from_file( (GtkWindow*)window,
+            "/usr/share/icons/Adwaita/48x48/devices/media-removable.png",
+            NULL);
+
     GtkWidget* button = gtk_button_new_with_label((gchar*)"Refresh");
 
     list = gtk_list_box_new ();
