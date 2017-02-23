@@ -798,17 +798,16 @@ gboolean update_device_list() {
 
     // delete widgets
     if(devices){
-        for(i=0; devices[i].node; ++i) {
-            if(verbosity >= 2){
-                printf("hiding %s\n",devices[i].shortdev);
-            }
-            GList *children, *iter;
-
-            children = gtk_container_get_children(GTK_CONTAINER(list));
-            for(iter = children; iter != NULL; iter = g_list_next(iter))
-            gtk_widget_destroy(GTK_WIDGET(iter->data));
-            g_list_free(children);
+        if(verbosity >= 2){
+            printf("hiding all devices\n");
         }
+
+        GList *children, *iter;
+
+        children = gtk_container_get_children(GTK_CONTAINER(list));
+        for(iter = children; iter != NULL; iter = g_list_next(iter))
+        gtk_widget_destroy(GTK_WIDGET(iter->data));
+        g_list_free(children);
     }
 
     devices = get_devices();
@@ -827,6 +826,7 @@ gboolean update_device_list() {
         }
     }
     else if (!devices){
+        // TODO displaying a list element with an error message
         if( verbosity >= 1){
             printf(KRED "[ERROR]" KNRM " Sorry couldn't find any appropriate devices.\n");
         }
