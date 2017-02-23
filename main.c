@@ -796,7 +796,9 @@ gboolean update_device_list() {
     // delete widgets
     if(devices){
         for(i=0; devices[i].node; ++i) {
-            printf("hiding %s\n",devices[i].shortdev);
+            if(verbosity >= 2){
+                printf("hiding %s\n",devices[i].shortdev);
+            }
             GList *children, *iter;
 
             children = gtk_container_get_children(GTK_CONTAINER(list));
